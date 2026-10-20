@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>CCPG — Transport solidaire | Accessibilité routière — Cloudflare — mairies</title>
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/><style>
+:root{--red:#ad2422;--dark:#742321;--cream:#fff9f6;--line:#ead7d0}*{box-sizing:border-box}body{margin:0;font:14px system-ui,Arial;color:#3c302d;background:#f8f4f1}header{background:linear-gradient(105deg,#8d1717,#bd2925);color:#fff;padding:17px 24px;display:flex;justify-content:space-between;gap:14px;align-items:center}h1{font-size:23px;margin:0}header p{margin:5px 0 0;color:#ffe6db;font-size:12px}.tag{border:1px solid #ffffff88;border-radius:30px;padding:8px 12px;font-size:12px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:12px;padding:12px;height:calc(100vh - 88px)}#map{height:100%;border-radius:12px;border:1px solid var(--line)}aside{background:white;border:1px solid var(--line);border-radius:12px;overflow:auto;padding:15px}details{border:1px solid var(--line);border-radius:9px;margin-bottom:12px;overflow:hidden;background:#fff}summary{padding:12px;background:#f8e8e1;color:var(--dark);font-weight:750;cursor:pointer}section{padding:13px}label{display:block;font-weight:650;margin:10px 0 5px}input,select{width:100%;padding:10px;border:1px solid #d9c4bb;border-radius:7px;font:inherit}button{background:var(--red);color:white;border:0;border-radius:7px;padding:10px 12px;cursor:pointer;font-weight:700}button:hover{background:var(--dark)}button:disabled{opacity:.55;cursor:wait}.secondary{background:#f1e3dc;color:var(--dark)}.secondary:hover{background:#e6cfc4}.actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.note{font-size:12px;line-height:1.5;color:#75645e}.status{padding:10px;border-radius:8px;background:#f8ede8;line-height:1.5;font-size:12px;margin:10px 0}.error{background:#ffe6e6;color:#8c2424}.legend-row{display:flex;gap:10px;align-items:center;margin:8px 0}.swatch{width:22px;height:17px;border-radius:3px;border:1px solid #0002}.small{font-size:12px}.check{display:flex;align-items:center;gap:8px;font-weight:500}.check input{width:auto}.leaflet-popup-content{line-height:1.5}.foot{font-size:11px;color:#776962;margin-top:12px;line-height:1.5}#progress{height:7px;background:#f0e2dd;border-radius:8px;overflow:hidden;margin-top:9px}#bar{height:100%;background:var(--red);width:0;transition:width .2s}@media(max-width:850px){.layout{display:flex;flex-direction:column;height:auto}#map{height:58vh;min-height:370px}aside{overflow:visible}header{padding:14px}h1{font-size:19px}.tag{display:none}}
+</style><style id="ccpg-basemap-v3-style">
+.basemap-switcher{position:absolute;top:18px;right:18px;z-index:1000;font-family:system-ui,Arial,sans-serif}.basemap-trigger{display:flex;align-items:center;gap:9px;background:#fff;color:#742321;border:1px solid #e4c9bf;border-radius:12px;padding:11px 15px;box-shadow:0 4px 18px #34221d30;font-weight:750;cursor:pointer}.basemap-trigger:hover{background:#fff2ec}.basemap-trigger:focus-visible,.basemap-option:focus-visible{outline:3px solid #b62824;outline-offset:2px}.basemap-trigger svg{width:20px;height:20px}.basemap-popover{position:absolute;right:0;top:calc(100% + 9px);width:318px;max-width:calc(100vw - 40px);background:#fff;border:1px solid #ead7d0;border-radius:14px;box-shadow:0 10px 32px #34221d38;padding:14px}.basemap-popover[hidden]{display:none}.basemap-heading{font-size:15px;font-weight:800;color:#742321;margin:0 0 4px}.basemap-description{font-size:12px;color:#77645e;margin:0 0 12px}.basemap-options{display:grid;grid-template-columns:1fr 1fr;gap:9px}.basemap-option{border:2px solid #e9ded9;border-radius:11px;background:#fff;color:#3c302d;text-align:left;padding:6px;cursor:pointer;font:inherit}.basemap-option:hover{border-color:#c78576;background:#fff8f5}.basemap-option[aria-checked="true"]{border-color:#ad2422;background:#fff1eb;box-shadow:0 0 0 1px #ad2422}.basemap-preview{height:68px;border-radius:7px;background:#f1eae5 center/cover no-repeat;display:block;margin-bottom:7px;position:relative;overflow:hidden}.basemap-preview::after{content:'';position:absolute;inset:0;border:1px solid #00000012;border-radius:7px}.basemap-name{display:block;font-size:12px;font-weight:750;line-height:1.3}.basemap-subtitle{display:block;font-size:11px;color:#77645e;margin-top:2px}.basemap-selected{font-size:11px;color:#8d2926;margin-top:11px;line-height:1.4}.basemap-popover .basemap-close{position:absolute;top:10px;right:10px;background:#f6ebe7;color:#742321;border:0;border-radius:7px;padding:4px 9px;font-size:18px}.basemap-switcher button:hover{background-color:#fff1eb}@media(max-width:850px){.basemap-switcher{top:12px;right:12px}.basemap-popover{width:290px}.basemap-preview{height:57px}}
+</style><style id="route-check-style">
+.route-mode{display:flex;align-items:center;gap:8px;margin:10px 0}.route-mode button{flex:1}.route-mode button[aria-pressed="true"]{background:#176b63;color:white}.route-result{border:1px solid #d7e7e2;background:#f2faf7;border-radius:10px;padding:12px;margin-top:10px;line-height:1.55}.route-result[hidden]{display:none}.route-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.route-metric{background:white;border-radius:8px;padding:9px;border:1px solid #d9e9e5}.route-metric strong{display:block;font-size:19px;color:#176b63}.route-hint{background:#f3f8f7;border-left:3px solid #176b63;padding:9px 11px;font-size:12px;line-height:1.5}.route-busy{cursor:progress!important}.route-active #map{cursor:crosshair}.route-active #map .leaflet-interactive{cursor:crosshair}.route-error{background:#fff0ef;border-color:#f2c6c2}.route-result h3{margin:0 0 5px;font-size:14px;color:#24574f}
+</style><style id="ccpg-pdf-style">
+.header-brand{display:flex;align-items:center;gap:17px;min-width:0}.ccpg-logo{width:175px;height:auto;max-height:68px;object-fit:contain;flex:none;background:#fff;border-radius:3px}.header-brand h1{line-height:1.2}#print-legend,#print-footer{display:none}
+@media(max-width:650px){.header-brand{gap:9px}.ccpg-logo{width:105px}.header-brand h1{font-size:16px}header p{font-size:10px}}
+@page{size:A4 landscape;margin:9mm}
+@media print{
+html,body{width:100%;height:auto!important;margin:0!important;padding:0!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+header{height:22mm!important;padding:3mm 5mm!important;display:flex!important;background:#9f201f!important;color:#fff!important;break-after:avoid}
+.header-brand{gap:5mm}.ccpg-logo{width:45mm;max-height:17mm}.header-brand h1{font-size:15pt!important}header p{font-size:8pt!important}.tag{font-size:8pt!important;padding:2mm 3mm!important}
+.layout{display:block!important;padding:3mm 0 0!important;height:auto!important}
+#map{display:block!important;width:100%!important;height:157mm!important;min-height:0!important;border:1px solid #bbb!important;border-radius:0!important;overflow:hidden!important;break-inside:avoid}
+aside,.basemap-switcher,.leaflet-control-zoom,.leaflet-control-attribution,.leaflet-popup,.leaflet-control-container .leaflet-top{display:none!important}
+#print-legend{display:block!important;position:fixed;bottom:24mm;left:15mm;background:#ffffffed;border:1px solid #aaa;padding:3mm 4mm;z-index:9000;border-radius:2mm;font:9pt Arial;max-width:65mm}
+#print-legend strong{display:block;margin-bottom:2mm;color:#742321}.print-row{display:flex;align-items:center;gap:2mm;margin:1mm 0}.print-swatch{display:inline-block;width:7mm;height:4mm;border:1px solid #888}
+#print-footer{display:block!important;font:8pt Arial;color:#555;margin-top:2mm}
+}
+
+/* Simulation des zonages kilométriques */
+.zoning-card{border:1px solid #e6cbc0;border-radius:10px;background:#fffaf6;padding:12px;margin-bottom:12px}.zoning-card h3{margin:0 0 9px;color:#742321;font-size:15px}.zoning-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.zoning-grid input{padding:7px}.zoning-table-wrap{max-height:265px;overflow:auto;margin-top:10px;border:1px solid #ead7d0;border-radius:8px}.zoning-table{border-collapse:collapse;width:100%;font-size:11px}.zoning-table th,.zoning-table td{padding:7px 6px;border-bottom:1px solid #f0e4de;text-align:left}.zoning-table th{position:sticky;top:0;background:#f8e8e1}.zoning-swatch{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px}.zoning-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.zoning-actions button{font-size:12px}.zoning-hint{font-size:11px;color:#755c53;line-height:1.5;margin:8px 0}.zoning-result{font-size:12px;font-weight:650;color:#742321;margin-top:8px}
+</style><style id="ccpg-print-v2">
+@page{size:A4 landscape;margin:7mm}
+@media print{
+ html,body{width:100%!important;height:auto!important;overflow:visible!important;background:white!important}
+ header{height:19mm!important;padding:2mm 4mm!important;align-items:center!important}
+ .ccpg-logo{width:39mm!important;max-height:15mm!important}
+ .header-brand h1{font-size:13pt!important}
+ .tag{display:none!important}
+ .layout{padding:2mm 0 0!important;margin:0!important;display:block!important}
+ #map{width:100%!important;height:162mm!important;min-height:162mm!important;max-height:162mm!important;border:1px solid #bbb!important;overflow:hidden!important}
+ #print-legend{position:fixed!important;bottom:24mm!important;left:12mm!important;top:auto!important;max-width:53mm!important;max-height:116mm!important;overflow:hidden!important;background:rgba(255,255,255,.95)!important;box-shadow:0 1mm 3mm #0002!important;padding:3mm!important;font:8pt Arial!important;line-height:1.25!important}
+ #print-legend strong{font-size:8.5pt!important;margin:2mm 0 1.5mm!important}
+ #print-legend .print-row{margin:1mm 0!important;gap:2mm!important}
+ #print-legend .print-swatch{width:7mm;height:3.5mm;flex:none}
+ #print-legend .print-note{font-size:7pt;color:#555;line-height:1.25;margin:2mm 0 3mm}
+ #print-legend .print-line{width:7mm;border-top:2px solid #8c3933;flex:none}
+ #print-legend .print-point{width:3mm;height:3mm;border-radius:50%;background:#a94b35;margin:0 2mm;flex:none}
+ #print-footer{font-size:7pt!important;margin:2mm 0 0!important}
+ .leaflet-control-attribution{display:none!important}
+}
+</style><style id="ccpg-portrait-export-v3">
+/* Action unique dans le bandeau, sans bloc d'export PDF dans le volet 05. */
+.header-pdf-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:none;margin-left:auto;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.75);color:white;border-radius:10px;padding:10px 13px;white-space:nowrap;font-size:13px}
+.header-pdf-button:hover{background:rgba(255,255,255,.25)}
+@media(max-width:650px){.header-pdf-button{padding:8px 10px}.header-pdf-button span{display:none}}
+@page{size:A4 portrait;margin:8mm}
+@media print{
+ html,body{width:100%!important;height:auto!important;overflow:visible!important;margin:0!important;padding:0!important}
+ header{height:20mm!important;min-height:20mm!important;padding:2mm 3mm!important;display:flex!important;align-items:center!important;break-after:avoid!important}
+ .header-pdf-button{display:none!important}
+ .ccpg-logo{width:39mm!important;max-height:16mm!important}
+ .header-brand h1{font-size:12pt!important}
+ .layout{display:block!important;padding:2mm 0 0!important;margin:0!important;height:auto!important}
+ #map{display:block!important;width:100%!important;height:190mm!important;min-height:190mm!important;max-height:190mm!important;border:1px solid #bbb!important;border-radius:0!important;overflow:hidden!important;break-inside:avoid!important}
+ #print-legend{display:block!important;position:static!important;left:auto!important;bottom:auto!important;top:auto!important;width:100%!important;max-width:none!important;max-height:none!important;margin:3mm 0 0!important;padding:2mm 3mm!important;box-shadow:none!important;border:1px solid #bbb!important;background:white!important;font:8pt Arial!important;line-height:1.3!important;break-inside:avoid!important}
+ #print-legend strong{display:block!important;margin:0 0 1.5mm!important;font-size:9pt!important}
+ #print-legend .print-row{display:inline-flex!important;align-items:center!important;gap:1.5mm!important;margin:1mm 5mm 1mm 0!important;white-space:nowrap!important}
+ #print-legend .print-swatch{width:6mm!important;height:3mm!important}
+ #print-legend .print-note{display:inline!important;margin:1mm 4mm 1mm 0!important;font-size:7pt!important}
+ #print-footer{display:block!important;margin:2mm 0 0!important;font-size:7pt!important;break-inside:avoid!important}
+ aside,.basemap-switcher,.leaflet-control-zoom,.leaflet-control-attribution,.leaflet-popup{display:none!important}
+}
+
+/* Aperçu de cadrage PDF interactif : carte Leaflet originale déplacée temporairement. */
+#ccpg-pdf-overlay[hidden]{display:none!important}
+#ccpg-pdf-overlay{position:fixed;inset:0;z-index:12000;background:#221b1bcc;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:16px;box-sizing:border-box}
+#ccpg-pdf-panel{width:min(100%,760px);background:#f6f2ef;border-radius:12px;padding:14px;box-shadow:0 12px 55px #0006}
+#ccpg-pdf-tools{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+#ccpg-pdf-tools strong{color:#742321;margin-right:auto}
+#ccpg-pdf-tools button{font-size:13px}
+#ccpg-pdf-sheet{background:#fff;padding:15px;width:min(100%,600px);margin:auto;box-shadow:0 2px 15px #0002}
+#ccpg-pdf-sheet-title{font-size:14px;font-weight:750;color:#742321;margin-bottom:8px}
+#ccpg-pdf-map-slot{width:100%;height:680px;overflow:hidden}
+#ccpg-pdf-map-slot #map{width:100%!important;height:100%!important;min-height:0!important;border-radius:0!important}
+#ccpg-pdf-sheet #print-legend{display:block!important;position:static!important;max-width:none!important;margin:8px 0 0;padding:6px;border:1px solid #ddd;background:white;font-size:11px}
+#ccpg-pdf-sheet #print-footer{display:block!important;margin-top:5px;font-size:9px;color:#555}
+/* Symboles visibles dans l’aperçu interactif ET dans le document imprimé. */
+#ccpg-pdf-sheet #print-legend .print-row{display:inline-flex!important;align-items:center!important;gap:6px!important;margin:3px 14px 3px 0!important;white-space:nowrap!important;vertical-align:middle!important}
+#ccpg-pdf-sheet #print-legend .print-swatch{display:inline-block!important;width:24px!important;height:13px!important;min-width:24px!important;flex:0 0 24px!important;border:1px solid #777!important;box-sizing:border-box!important;vertical-align:middle!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+#ccpg-pdf-sheet #print-legend .print-line{display:inline-block!important;width:24px!important;min-width:24px!important;height:0!important;border-top:3px solid #8c3933!important;flex:0 0 24px!important}
+#ccpg-pdf-sheet #print-legend .print-point{display:inline-block!important;width:11px!important;height:11px!important;min-width:11px!important;flex:0 0 11px!important;border-radius:50%!important;background:#a94b35!important;border:1px solid white!important;box-shadow:0 0 0 1px #a94b35!important;margin:0 7px!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+
+@media print{
+ @page{size:A4 portrait;margin:8mm}
+ body.ccpg-pdf-preview > header,body.ccpg-pdf-preview > .layout,body.ccpg-pdf-preview > #print-legend,body.ccpg-pdf-preview > #print-footer{display:none!important}
+ body.ccpg-pdf-preview #ccpg-pdf-overlay{position:static!important;display:block!important;overflow:visible!important;padding:0!important;background:white!important}
+ body.ccpg-pdf-preview #ccpg-pdf-panel{width:100%!important;padding:0!important;border:0!important;box-shadow:none!important;background:white!important}
+ body.ccpg-pdf-preview #ccpg-pdf-tools{display:none!important}
+ body.ccpg-pdf-preview #ccpg-pdf-sheet{width:100%!important;padding:0!important;margin:0!important;box-shadow:none!important}
+ body.ccpg-pdf-preview #ccpg-pdf-sheet-title{font-size:13pt!important;margin:0 0 3mm!important}
+ body.ccpg-pdf-preview #ccpg-pdf-map-slot{height:213mm!important;overflow:hidden!important}
+ body.ccpg-pdf-preview #ccpg-pdf-map-slot #map{width:100%!important;height:100%!important;min-height:0!important;max-height:none!important}
+ body.ccpg-pdf-preview #print-legend{display:block!important;position:static!important;margin:2mm 0!important;padding:1mm!important;font-size:8pt!important;max-height:none!important}
+ body.ccpg-pdf-preview #print-footer{display:block!important;font-size:7pt!important;margin:1mm 0!important}
+ body.ccpg-pdf-preview .leaflet-control-zoom,body.ccpg-pdf-preview .leaflet-control-attribution,body.ccpg-pdf-preview .basemap-switcher{display:none!important}
+}
+</style><style>
+#route-mode,#route-clear,.route-mode,#route-result,#route-hint{display:none!important}
+#ccpg-consultation-banner{background:#e9f3ef;border-left:4px solid #176b63;padding:12px 14px;margin:12px 0;color:#163c32;font-weight:600}
+#ccpg-consultation-note{font-size:12px;line-height:1.5;color:#555;margin:8px 0}
+</style></head><body><header><div class="header-brand"><img alt="Logo Communauté de communes du Pont du Gard" class="ccpg-logo" src="data:image/png;base64,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"/><div><h1>Transport solidaire · Accessibilité routière</h1><p>Communauté de communes du Pont du Gard — outil exploratoire d'aide à la décision</p></div></div><div class="tag">15 communes · voiture · 5 à 30 min</div><button aria-label="Exporter la carte en PDF" class="header-pdf-button" id="export-pdf" title="Exporter la carte au format PDF (A4 portrait)" type="button"><svg aria-hidden="true" fill="none" height="21" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" viewbox="0 0 24 24" width="21"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M8 15h8M8 18h5"></path></svg><span>PDF</span></button></header><main class="layout"><div aria-label="Carte interactive des isochrones routières" id="map"><div class="basemap-switcher" id="basemap-switcher"><button aria-controls="basemap-popover" aria-expanded="false" aria-label="Choisir un fond de carte" class="basemap-trigger" id="basemap-trigger" type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"></path><path d="M9 3v15m6-12v15"></path></svg><span>Fonds de carte</span><span aria-hidden="true">▾</span></button><div class="basemap-popover" hidden="" id="basemap-popover"><h3 class="basemap-heading">Choisir un fond</h3><p class="basemap-description">Sélectionnez l'affichage adapté à votre analyse.</p><button aria-label="Fermer le panneau" class="basemap-close" id="basemap-close" type="button">×</button><div aria-label="Fonds de carte" class="basemap-options" id="basemap-options" role="radiogroup"></div><div aria-live="polite" class="basemap-selected" id="basemap-selected"></div></div></div></div><aside>
+<details open=""><summary>01 · Calcul des isochrones</summary><section><div id="ccpg-consultation-banner">VERSION CONSULTATION · Données pré-calculées · Aucun calcul ORS nécessaire</div><p class="note">Les couronnes représentent le temps minimal estimé pour rejoindre l'un des 15 centres communaux par le réseau routier. Elles ne sont pas des cercles géométriques.</p><label for="iso-origin">Origine des isochrones</label><select id="iso-origin"><option value="all">Ensemble des 15 mairies CCPG</option></select><p id="ccpg-consultation-note">Les isochrones globaux sont disponibles. Les 15 communes individuelles seront ajoutées progressivement, sans nouveau calcul pour les visiteurs.</p><p class="note">Choisissez une mairie CCPG ou l’ensemble des 15. Les couronnes représentent des trajets routiers au départ des mairies.</p><label for="max">Durée maximale</label><select id="max"><option value="3000">50 minutes (5 couronnes)</option><option value="2400">40 minutes (4 couronnes)</option><option value="1800">30 minutes (3 couronnes)</option><option value="1200">20 minutes (2 couronnes)</option><option value="600">10 minutes (1 couronne)</option></select><label for="iso-opacity">Opacité des isochrones : <strong id="iso-opacity-value">45 %</strong></label><input aria-label="Opacité des isochrones" id="iso-opacity" max="100" min="0" step="5" style="accent-color:#ad2422" type="range" value="45"/><div class="actions"><button class="secondary" id="clear">Effacer</button></div><div class="status" id="status" role="status">Prêt. Saisissez votre clé ORS puis lancez le calcul.</div><div id="progress"><div id="bar"></div></div></section></details>
+<details open=""><summary>02 · Affichage et légende</summary><section><p class="note">Utilisez le bouton « Fonds de carte » en haut à droite de la carte pour choisir un plan, une carte topographique ou une vue aérienne.</p><label class="check"><input checked="" id="showCenters" type="checkbox"/> Centres des communes CCPG</label><label class="check"><input checked="" id="showBoundary" type="checkbox"/> Périmètre administratif CCPG</label><label class="check"><input checked="" id="showIso" type="checkbox"/> Couronnes routières</label><div id="legend"></div><p class="note">Les couronnes de 0–10, 10–20, 20–30, 30–40 et 40–50 minutes sont calculées par ORS, depuis la mairie sélectionnée ou depuis les 15 mairies CCPG.</p></section></details>
+<details open=""><summary>03 · Vérifier un trajet routier</summary><section>
+<p class="note">Contrôlez une isochrone en calculant un trajet <strong>depuis un point extérieur vers le centre CCPG le plus rapide à atteindre</strong>.</p>
+<div class="route-mode"></div>
+<div class="route-hint" id="route-hint" role="status">Activez la sélection, puis cliquez sur la carte. Les nouveaux calculs nécessitent une clé ORS saisie dans le volet 01.</div>
+<div aria-live="polite" class="route-result" hidden="" id="route-result"></div>
+<p class="note">Le centre retenu est celui qui minimise le temps routier calculé, pas forcément la distance. Estimation sans trafic en temps réel. Les temps peuvent différer des couronnes, calculées dans l'autre sens.</p>
+</section></details>
+<details><summary>04 · Communes de référence</summary><section><div class="small" id="communes"></div><p class="note">Les points sont obtenus par géocodage des communes via l'API Géo. Les coordonnées sont ensuite rapprochées du réseau routier par ORS.</p></section></details>
+<details><summary>05 · Export et méthodologie</summary><section><div class="actions"><button class="secondary" disabled="" id="export">Exporter les couronnes GeoJSON</button><button class="secondary" id="zoom">Recentrer</button></div><p class="note">Modèle de temps estimés, sans trafic temps réel. L'analyse cartographique ne définit pas à elle seule les tarifs du transport solidaire. Le sens de circulation peut affecter les temps : ici, on calcule depuis la CCPG vers l'extérieur.</p></section></details><div class="foot">Sources : BANATIC (périmètre EPCI), API Géo (communes), OpenStreetMap / OpenRouteService (réseau et calculs). Fonds : OpenStreetMap, OpenTopoMap, Esri World Street Map, Esri World Topo Map et imagerie Esri (attributions détaillées sur la carte). Géométries calculées seulement après activation de l'API.</div>
+<details open=""><summary>06 · Zonage kilométrique par commune</summary><section>
+</section></details></aside></main><div aria-hidden="true" id="print-legend"></div><div id="print-footer">CCPG · Transport solidaire — estimation OpenRouteService / OpenStreetMap · Sans trafic temps réel · Carte indicative</div>
+<input disabled="disabled" id="key" style="display:none!important"/><button disabled="disabled" id="calculate" style="display:none!important"></button><button disabled="disabled" id="zoning-run" style="display:none!important"></button><button disabled="disabled" id="matrix-test" style="display:none!important"></button><button disabled="disabled" id="route-mode" style="display:none!important"></button><button disabled="disabled" id="route-clear" style="display:none!important"></button><input disabled="disabled" id="z2" style="display:none!important" value="5"/><input disabled="disabled" id="z3" style="display:none!important" value="10"/><input disabled="disabled" id="z4" style="display:none!important" value="20"/><input disabled="disabled" id="z5" style="display:none!important" value="30"/><input disabled="disabled" id="matrix-endpoint" style="display:none!important"/><script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script><script>
+'use strict';
+const COMMUNES=[['30012','Aramon'],['30085','Collias'],['30089','Comps'],['30103','Domazan'],['30107','Estézargues'],['30116','Fournès'],['30166','Meynes'],['30179','Montfrin'],['30207','Pouzilhac'],['30212','Remoulins'],['30235','Saint-Bonnet-du-Gard'],['30260',"Saint-Hilaire-d’Ozilhan"],['30328','Théziers'],['30340','Valliguières'],['30346','Vers-Pont-du-Gard']];
+const colors=['#3fba85','#e5dc6a','#f5b75d','#e9854e','#d24b4b'];const ranges=[600,1200,1800,2400,3000];
+const map=L.map('map',{preferCanvas:true}).setView([43.94,4.61],10);
+const fonds={
+  'OpenStreetMap':L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© contributeurs OpenStreetMap'}),
+  'Esri World Street Map':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri — Esri et contributeurs'}),
+  'OpenTopoMap':L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'© contributeurs OpenStreetMap, SRTM | © OpenTopoMap (CC-BY-SA)'}),
+  'Orthophoto Esri':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri — Sources : Esri, Maxar, Earthstar Geographics et partenaires'}),
+  'Esri World Topo Map':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri — Esri et contributeurs'})
+};
+let activeBasemap='OpenStreetMap';fonds[activeBasemap].addTo(map);
+const basemapInfo=[
+  {id:'OpenStreetMap',title:'OpenStreetMap',subtitle:'Plan routier',preview:'https://tile.openstreetmap.org/10/525/374.png'},
+  {id:'Esri World Street Map',title:'Esri Rues',subtitle:'Routes et localités',preview:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/10/374/525'},
+  {id:'OpenTopoMap',title:'OpenTopoMap',subtitle:'Relief et courbes',preview:'https://a.tile.opentopomap.org/10/525/374.png'},
+  {id:'Orthophoto Esri',title:'Vue aérienne',subtitle:'Photographies aériennes',preview:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/10/374/525'},
+  {id:'Esri World Topo Map',title:'Esri Topo',subtitle:'Carte topographique',preview:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/10/374/525'}
+];
+const basemapTrigger=document.getElementById('basemap-trigger'),basemapPopover=document.getElementById('basemap-popover');
+function toggleBasemap(open){basemapPopover.hidden=!open;basemapTrigger.setAttribute('aria-expanded',String(open));}
+function renderBasemaps(){document.getElementById('basemap-options').innerHTML=basemapInfo.map((item,i)=>`<button type="button" class="basemap-option" role="radio" aria-checked="${item.id===activeBasemap}" data-basemap="${i}"><span class="basemap-preview" style="background-image:url('${item.preview}')"></span><span class="basemap-name">${item.title}</span><span class="basemap-subtitle">${item.subtitle}</span></button>`).join('');document.getElementById('basemap-selected').textContent='Fond actif : '+basemapInfo.find(x=>x.id===activeBasemap).title;}
+renderBasemaps();
+basemapTrigger.addEventListener('click',()=>toggleBasemap(basemapPopover.hidden));
+document.getElementById('basemap-close').addEventListener('click',()=>toggleBasemap(false));
+document.getElementById('basemap-options').addEventListener('click',e=>{const btn=e.target.closest('[data-basemap]');if(!btn)return;const selected=basemapInfo[Number(btn.dataset.basemap)].id;if(selected!==activeBasemap){map.removeLayer(fonds[activeBasemap]);activeBasemap=selected;fonds[activeBasemap].addTo(map);fonds[activeBasemap].bringToBack();}renderBasemaps();toggleBasemap(false);basemapTrigger.focus();});
+document.addEventListener('pointerdown',e=>{if(!document.getElementById('basemap-switcher').contains(e.target))toggleBasemap(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')toggleBasemap(false)});
+L.DomEvent.disableClickPropagation(document.getElementById('basemap-switcher'));
+L.DomEvent.disableScrollPropagation(document.getElementById('basemap-switcher'));
+L.control.scale({imperial:false}).addTo(map);
+const centersLayer=L.layerGroup().addTo(map),boundaryLayer=L.geoJSON(null,{style:{color:'#9d2523',weight:2.5,fillColor:'#c53633',fillOpacity:.075}}).addTo(map),isoLayer=L.geoJSON(null,{style:f=>({color:'#785f57',weight:.6,fillColor:f.properties.color,fillOpacity:Number(document.getElementById('iso-opacity')?.value??45)/100}) ,onEachFeature:(f,l)=>l.bindPopup(`<b>${f.properties.label}</b><br>Temps de trajet en voiture (estimation ORS)`) }).addTo(map);
+const el=id=>document.getElementById(id);let centers=[],bandFeatures=[],busy=false;
+function status(t,error=false){el('status').textContent=t;el('status').className='status'+(error?' error':'')}
+function progress(n){el('bar').style.width=n+'%'}
+function setBusy(v){busy=v;el('calculate').disabled=v;el('calculate').textContent=v?'Calcul en cours…':'Calculer les isochrones'}
+function refreshLegend(){const max=Number(el('max').value),lim=ranges.filter(v=>v<=max);el('legend').innerHTML=lim.map((v,i)=>`<div class="legend-row"><span class="swatch" style="background:${colors[i]}"></span>${i*10}–${v/60} minutes</div>`).join('')}
+refreshLegend();el('max').addEventListener('change',refreshLegend);el('iso-opacity').addEventListener('input',e=>{const v=Number(e.target.value);el('iso-opacity-value').textContent=v+' %';isoLayer.setStyle({fillOpacity:v/100});});
+function visibility(){[['showCenters',centersLayer],['showBoundary',boundaryLayer],['showIso',isoLayer]].forEach(([id,l])=>{if(el(id).checked){if(!map.hasLayer(l))l.addTo(map)}else if(map.hasLayer(l))map.removeLayer(l)})}
+['showCenters','showBoundary','showIso'].forEach(id=>el(id).addEventListener('change',visibility));
+async function loadCommunes(){status('Chargement des 15 communes et du périmètre administratif…');try{const responses=await Promise.all(COMMUNES.map(async ([code,name])=>{const [r,mairieResponse]=await Promise.all([fetch(`https://geo.api.gouv.fr/communes/${code}?fields=nom,code,contour&format=geojson&geometry=contour`),fetch(`https://geo.api.gouv.fr/communes/${code}?fields=nom,code&format=geojson&geometry=mairie`)]);if(!r.ok)throw Error(`Contour de ${name} : HTTP ${r.status}`);if(!mairieResponse.ok)throw Error(`Mairie de ${name} : HTTP ${mairieResponse.status}`);const [contour,mairie]=await Promise.all([r.json(),mairieResponse.json()]);const c=mairie.geometry?.coordinates;if(mairie.geometry?.type!=='Point'||!Array.isArray(c)||c.length<2||!c.slice(0,2).every(Number.isFinite))throw Error('Coordonnées de mairie indisponibles pour '+name);return {contour,coords:c}}));centers=[];boundaryLayer.clearLayers();centersLayer.clearLayers();responses.forEach(({contour,coords:c},i)=>{const code=COMMUNES[i][0],name=COMMUNES[i][1];centers.push({code,name,coords:c});boundaryLayer.addData(contour);L.circleMarker([c[1],c[0]],{radius:5,weight:2,color:'#fff',fillColor:'#a91e20',fillOpacity:1}).bindPopup(`<b>Mairie de ${name}</b><br>Point de référence routier CCPG`).addTo(centersLayer)});el('iso-origin').innerHTML='<option value="all">Ensemble des 15 mairies CCPG</option>'+centers.map(c=>'<option value="'+c.code+'">'+c.name+'</option>').join('');el('communes').innerHTML=centers.map(c=>`<div style="padding:5px 0;border-bottom:1px solid #f1e4df">${c.name} <span style="color:#8a7771">(${c.code})</span></div>`).join('');map.fitBounds(boundaryLayer.getBounds().pad(.25));status('15 communes chargées. Prêt pour le calcul routier.')}catch(e){status('Impossible de charger les communes : '+e.message,true)}}
+// Turf union/difference uses Turf 6 signature (polygon1, polygon2).
+function dissolve(features){let merged=null;for(const f of features){if(!merged){merged=f;continue}try{merged=turf.union(merged,f)}catch(e){throw Error('Union géométrique impossible : '+e.message)}}return merged}
+async function calculate(){if(busy)return;if(centers.length!==15){status('Les 15 communes doivent être chargées avant le calcul.',true);return}const key=el('key').value.trim();if(!key){status('Saisissez votre clé OpenRouteService.',true);return}setBusy(true);progress(0);isoLayer.clearLayers();bandFeatures=[];el('export').disabled=true;try{const max=Number(el('max').value),thresholds=ranges.filter(v=>v<=max);const chosen=el('iso-origin').value;const origins=chosen==='all'?centers:centers.filter(c=>c.code===chosen);if(!origins.length)throw Error('Sélection de commune invalide');const perRange=new Map(thresholds.map(t=>[t,[]]));const batchCount=Math.ceil(origins.length/5);for(let batch=0;batch<batchCount;batch++){const subset=origins.slice(batch*5,(batch+1)*5);status(`Calcul routier ${batch+1}/${batchCount} : ${subset.map(c=>c.name).join(', ')}…`);const r=await fetch('/api/ors/isochrones/driving-car',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-ORS-API-Key':key},body:JSON.stringify({locations:subset.map(c=>c.coords),range:thresholds,range_type:'time',location_type:'start'})});const raw=await r.text();if(!r.ok)throw Error(`ORS HTTP ${r.status} : ${raw.slice(0,240)}`);const geo=JSON.parse(raw);if(!geo.features?.length)throw Error('ORS n’a renvoyé aucun polygone');for(const f of geo.features){const v=Number(f.properties?.value);if(perRange.has(v))perRange.get(v).push(f)}progress((batch+1)/batchCount*70)}
+let previous=null;for(let i=0;i<thresholds.length;i++){const t=thresholds[i],fs=perRange.get(t);if(!fs.length)throw Error(`Aucune géométrie pour ${t/60} minutes`);status(`Fusion des polygones : ${t/60} minutes…`);const merged=dissolve(fs);if(!merged)throw Error('Fusion vide pour '+t);let band=merged;if(previous){try{band=turf.difference(merged,previous)}catch(e){throw Error('Différence géométrique impossible à '+t/60+' min : '+e.message)}}if(band){band.properties={min_minutes:i*10,max_minutes:t/60,label:`${i*10}–${t/60} minutes`,color:colors[i],mode:'driving-car',direction:'CCPG vers extérieur',source:'OpenRouteService'};bandFeatures.push(band)}previous=merged;progress(70+(i+1)/thresholds.length*30)}isoLayer.addData({type:'FeatureCollection',features:bandFeatures.slice().reverse()});visibility();window.ccpgIsochronesCalculated=true;document.getElementById('zoning-visible').checked=false;if(window.ccpgZoningLayer && map.hasLayer(window.ccpgZoningLayer))map.removeLayer(window.ccpgZoningLayer);el('export').disabled=false;status(`${bandFeatures.length} couronnes calculées depuis ${chosen==='all'?'les 15 mairies CCPG':origins[0].name}. Vous pouvez exporter le GeoJSON.`);if(isoLayer.getLayers().length)map.fitBounds(isoLayer.getBounds().pad(.08))}catch(e){isoLayer.clearLayers();bandFeatures=[];status('Calcul interrompu (progression sauvegardée : relancez pour reprendre) : '+e.message,true)}finally{setBusy(false)}}
+el('calculate').addEventListener('click',calculate);el('clear').addEventListener('click',()=>{isoLayer.clearLayers();bandFeatures=[];el('export').disabled=true;progress(0);status('Couronnes effacées. Les communes restent affichées.')});el('zoom').addEventListener('click',()=>{if(boundaryLayer.getLayers().length)map.fitBounds(boundaryLayer.getBounds().pad(.25))});el('export').addEventListener('click',()=>{if(!bandFeatures.length)return;const blob=new Blob([JSON.stringify({type:'FeatureCollection',features:bandFeatures},null,2)],{type:'application/geo+json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='ccpg_transport_solidaire_isochrones_voiture.geojson';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});loadCommunes();
+
+// Contrôle de trajets réels : matrice de durées 1 x 15, puis itinéraire routier détaillé.
+const routeLayer=L.layerGroup().addTo(map);
+let routeSelecting=false,routeBusy=false,routeRequestId=0;
+const routeModeBtn=el('route-mode'),routeHint=el('route-hint'),routeResult=el('route-result');
+function routeMessage(message,isError=false){routeHint.textContent=message;routeHint.style.borderLeftColor=isError?'#ad2422':'#176b63';}
+function setRouteSelecting(value){routeSelecting=value;routeModeBtn.setAttribute('aria-pressed',String(value));routeModeBtn.textContent=value?'✓ Sélection active · cliquez sur la carte':'📍 Choisir un départ sur la carte';document.body.classList.toggle('route-active',value);}
+function resetRoute(){routeRequestId++;routeBusy=false;routeLayer.clearLayers();routeResult.hidden=true;routeResult.replaceChildren();routeMessage('Trajet effacé. Activez la sélection pour choisir un autre départ.');}
+routeModeBtn.addEventListener('click',()=>setRouteSelecting(!routeSelecting));
+el('route-clear').addEventListener('click',resetRoute);
+function km(m){return (m/1000).toLocaleString('fr-FR',{maximumFractionDigits:1})+' km'}
+function mins(sec){return (sec/60).toLocaleString('fr-FR',{maximumFractionDigits:1})+' min'}
+async function orsPost(endpoint,key,payload){
+ const response=await fetch('/api/ors/'+endpoint,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-ORS-API-Key':key},body:JSON.stringify(payload)});
+ const raw=await response.text();let parsed;try{parsed=JSON.parse(raw)}catch{parsed=null}
+ if(!response.ok)throw Error('Calcul ORS HTTP '+response.status+' : '+(parsed?.error||parsed?.message||raw.slice(0,200))+' — Vérifiez la clé ORS et votre quota.');
+ if(!parsed)throw Error('Réponse ORS non interprétable');return parsed;
+}
+
+map.on('click',async event=>{
+ if(!routeSelecting||routeBusy)return;
+ if(centers.length!==15){routeMessage('Les communes CCPG ne sont pas encore chargées.',true);return}
+ const key=el('key').value.trim();if(!key){routeMessage('Saisissez d’abord votre clé ORS dans le volet 01.',true);return}
+ const requestId=++routeRequestId;routeBusy=true;routeLayer.clearLayers();routeResult.hidden=true;
+ const departure=[event.latlng.lng,event.latlng.lat];
+ const startMarker=L.circleMarker(event.latlng,{radius:8,color:'#fff',weight:3,fillColor:'#176b63',fillOpacity:1}).bindPopup('Départ choisi').addTo(routeLayer);
+ routeMessage('Recherche du centre CCPG le plus rapide à rejoindre sur le réseau routier…');
+ try{
+  // Directions uniquement : Matrix renvoie HTTP 403 sur ce compte ORS.
+  // Comparer les 15 centres sur les durées routières réelles.
+  // Préselection de trois centres à vol d'oiseau, puis itinéraires séquentiels.
+  // Limite les appels API (3 maximum au lieu de 15 par clic).
+  const ranked=centers.map((c,i)=>({index:i,approx:Math.hypot((c.coords[0]-departure[0])*Math.cos(departure[1]*Math.PI/180),c.coords[1]-departure[1])})).sort((a,b)=>a.approx-b.approx).slice(0,3);
+  const candidates=[];let lastError=null;
+  for(const candidate of ranked){
+   if(requestId!==routeRequestId)return;
+   const c=centers[candidate.index];
+   routeMessage('Calcul de '+(candidates.length+1)+' / '+ranked.length+' trajets vers les centres proches…');
+   try{
+    const d=await orsPost('directions/driving-car/geojson',key,{coordinates:[departure,c.coords],instructions:false});
+    const f=d.features?.[0],sum=f?.properties?.summary;
+    if(f?.geometry&&Number.isFinite(sum?.duration))candidates.push({index:candidate.index,feature:f,summary:sum});
+   }catch(err){lastError=err;console.warn('Itinéraire indisponible vers '+c.name,err);
+    if(/429|403|quota|rate limit/i.test(err.message))break;
+   }
+  }
+  if(requestId!==routeRequestId)return;
+  const best=candidates.filter(Boolean).sort((a,b)=>a.summary.duration-b.summary.duration)[0];
+  if(!best)throw Error('Aucun itinéraire disponible vers les 3 centres présélectionnés. '+(lastError?.message||'Vérifiez votre clé et le quota ORS.'));
+  const target=centers[best.index],feature=best.feature,summary=best.summary;
+  routeMessage('Centre le plus rapide parmi les 3 présélectionnés : '+target.name+'. Affichage du trajet…');
+  const route=L.geoJSON(feature,{style:{color:'#176b63',weight:6,opacity:.95,lineCap:'round',lineJoin:'round'}}).addTo(routeLayer);
+  route.bringToFront();
+  L.circleMarker([target.coords[1],target.coords[0]],{radius:8,color:'#fff',weight:3,fillColor:'#ad2422',fillOpacity:1}).bindPopup('Centre CCPG : '+target.name).addTo(routeLayer);
+  const expected=bandFeatures.find(f=>{try{return turf.booleanPointInPolygon(turf.point(departure),f)}catch{return false}});
+  const note=expected?('Couronne visible au départ : '+expected.properties.label+' (sens CCPG → extérieur).'):'Aucune couronne calculée ne contient ce point, ou les couronnes sont absentes.';
+  routeResult.replaceChildren();routeResult.hidden=false;
+  const heading=document.createElement('h3');heading.textContent='Centre le plus rapide parmi 3 centres présélectionnés : '+target.name;routeResult.appendChild(heading);
+  const metrics=document.createElement('div');metrics.className='route-metrics';
+  for(const [value,label] of [[mins(summary.duration),'Durée routière estimée'],[km(summary.distance),'Distance routière']]){
+   const card=document.createElement('div');card.className='route-metric';const strong=document.createElement('strong');strong.textContent=value;card.appendChild(strong);card.appendChild(document.createTextNode(label));metrics.appendChild(card);
+  }
+  routeResult.appendChild(metrics);
+  const extra=document.createElement('p');extra.className='note';extra.textContent=note+' Comparaison de 3 centres présélectionnés à vol d’oiseau par ORS Directions, sans Matrix : le plus proche sur route parmi les 15 n’est pas garanti.';routeResult.appendChild(extra);
+  const coords=document.createElement('p');coords.className='note';coords.textContent='Départ : '+departure[1].toFixed(5)+', '+departure[0].toFixed(5)+' · Arrivée : '+target.name;routeResult.appendChild(coords);
+  routeMessage('Itinéraire routier calculé (3 centres présélectionnés). Chaque clic utilise jusqu’à 3 appels ORS.');
+  if(route.getBounds().isValid())map.fitBounds(route.getBounds().pad(.22),{maxZoom:13});
+ }catch(error){if(requestId!==routeRequestId)return;routeMessage('Calcul du trajet impossible : '+error.message,true)}
+ finally{if(requestId===routeRequestId)routeBusy=false}
+});
+</script><script id="ccpg-print-script">
+(function(){
+  const btn=document.getElementById('export-pdf');
+  const legend=document.getElementById('print-legend');
+  const footer=document.getElementById('print-footer');
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function buildPrintLegend(){
+    const visible=id=>Boolean(document.getElementById(id)?.checked);
+    const rows=[];
+    if(visible('showIso') && map.hasLayer(isoLayer) && bandFeatures.length){
+      rows.push('<strong>Temps de trajet routier</strong>');
+      // La légende correspond aux couronnes réellement calculées, pas au maximum du menu.
+      for(const feature of [...bandFeatures].sort((a,b)=>a.properties.min_minutes-b.properties.min_minutes)){
+        const p=feature.properties||{};
+        rows.push('<div class="print-row"><span class="print-swatch" style="background:'+esc(p.color||'#999')+'"></span>'+esc(p.label||`${p.min_minutes}–${p.max_minutes} min`)+'</div>');
+      }
+      const origin=document.getElementById('iso-origin');
+      const originText=origin?.selectedOptions?.[0]?.textContent||'15 communes CCPG';
+      rows.push('<div class="print-note">Départ : '+esc(originText)+' · voiture · ORS</div>');
+    }
+    if(visible('zoning-visible') && typeof zoningLayer!=='undefined' && typeof zoningFeatures!=='undefined' && map.hasLayer(zoningLayer) && zoningFeatures.length){
+      rows.push('<strong>Zonage kilométrique</strong>');
+      const colors=typeof zoningColors!=='undefined'?zoningColors:{1:'#fff9dc',2:'#ffc928',3:'#f58a18',4:'#e34427',5:'#b92835'};
+      const present=new Set(zoningFeatures.filter(f=>{const p=f.properties||{};return p.zone===1||(Number.isFinite(p.distance_km)&&p.distance_km<=30)}).map(f=>Number(f.properties.zone)));
+      for(const [zone,label] of [[1,'Communes CCPG'],[2,'0–5 km'],[3,'5–10 km'],[4,'10–20 km'],[5,'20–30 km']]){
+        if(present.has(zone))rows.push('<div class="print-row"><span class="print-swatch" style="background:'+esc(colors[zone])+'"></span>'+label+'</div>');
+      }
+      rows.push('<div class="print-note">Distances routières de mairie à mairie · ORS</div>');
+    }
+    if(visible('showBoundary'))rows.push('<div class="print-row"><span class="print-line"></span>Limites des communes CCPG</div>');
+    if(visible('showCenters'))rows.push('<div class="print-row"><span class="print-point"></span>Mairies CCPG</div>');
+    legend.innerHTML=rows.join('')||'<strong>Carte des communes CCPG</strong>';
+    footer.textContent='CCPG · Transport solidaire — Données OpenRouteService / OpenStreetMap · Estimations sans trafic en temps réel · Carte indicative';
+  }
+  const mapNode=document.getElementById('map');
+  const originalParent=mapNode.parentNode;
+  const originalNext=mapNode.nextSibling;
+  const overlay=document.createElement('div');
+  overlay.id='ccpg-pdf-overlay';overlay.hidden=true;
+  overlay.innerHTML='<div id="ccpg-pdf-panel" role="dialog" aria-modal="true" aria-label="Aperçu de la carte PDF"><div id="ccpg-pdf-tools"><strong>Cadrage de la carte · A4 portrait</strong><button type="button" id="ccpg-pdf-reset" class="secondary">Recentrer</button><button type="button" id="ccpg-pdf-print">Imprimer / Enregistrer en PDF</button><button type="button" id="ccpg-pdf-close" class="secondary">Fermer</button></div><div id="ccpg-pdf-sheet"><div id="ccpg-pdf-sheet-title">CCPG — Transport solidaire · Accessibilité routière</div><div id="ccpg-pdf-map-slot"></div></div><p class="note" style="text-align:center">Déplacez la carte avec la souris et utilisez la molette ou les boutons + / − pour régler le zoom.</p></div>';
+  document.body.appendChild(overlay);
+  const slot=overlay.querySelector('#ccpg-pdf-map-slot');
+  const sheet=overlay.querySelector('#ccpg-pdf-sheet');
+  let initialView=null;
+  let isOpen=false;
+  function refreshMap(){map.invalidateSize({pan:false});}
+  function openPreview(){
+    if(isOpen)return;
+    buildPrintLegend();
+    initialView={center:map.getCenter(),zoom:map.getZoom()};
+    isOpen=true;
+    slot.appendChild(mapNode);
+    sheet.appendChild(legend);sheet.appendChild(footer);
+    overlay.hidden=false;
+    document.body.classList.add('ccpg-pdf-preview');
+    requestAnimationFrame(()=>{refreshMap();map.setView(initialView.center,initialView.zoom,{animate:false});});
+  }
+  function closePreview(){
+    if(!isOpen)return;
+    overlay.hidden=true;
+    document.body.classList.remove('ccpg-pdf-preview');
+    if(originalNext&&originalNext.parentNode===originalParent)originalParent.insertBefore(mapNode,originalNext);
+    else originalParent.appendChild(mapNode);
+    document.body.appendChild(legend);document.body.appendChild(footer);
+    isOpen=false;
+    requestAnimationFrame(()=>{refreshMap();if(initialView)map.setView(initialView.center,initialView.zoom,{animate:false});});
+  }
+  btn.addEventListener('click',openPreview);
+  overlay.querySelector('#ccpg-pdf-close').addEventListener('click',closePreview);
+  overlay.querySelector('#ccpg-pdf-reset').addEventListener('click',()=>{if(initialView)map.setView(initialView.center,initialView.zoom,{animate:false});});
+  overlay.querySelector('#ccpg-pdf-print').addEventListener('click',()=>{
+    buildPrintLegend();
+    // Adapter Leaflet à la taille exacte de la feuille avant impression.
+    refreshMap();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
+  });
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closePreview();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isOpen)closePreview();});
+  window.addEventListener('beforeprint',()=>{if(isOpen)buildPrintLegend();});
+  window.addEventListener('afterprint',()=>{if(isOpen)requestAnimationFrame(refreshMap);});
+})();
+</script>
+<script>
+// ZONAGE ROUTIER : mairies API Géo vers mairies CCPG, distance ORS.
+const zoningColors={1:'#fff9dc',2:'#ffc928',3:'#f58a18',4:'#e34427',5:'#b92835',0:'#a81923'};
+const zoningLayer=L.geoJSON(null,{style:f=>({color:'#604c46',weight:.7,fillColor:(f.properties.zone===0 && !Number.isFinite(f.properties.distance_km))?'#b8b8b8':(zoningColors[f.properties.zone]||'#ddd'),fillOpacity:Number(document.getElementById('zoning-opacity')?.value||90)/100}),onEachFeature:(f,l)=>l.bindPopup('<b>'+f.properties.nom+'</b><br>Zone '+(f.properties.zone||'hors périmètre')+'<br>'+ (f.properties.distance_km===null?'Distance non disponible':f.properties.distance_km.toFixed(2)+' km routiers')+'<br>Centre CCPG : '+(f.properties.centre_ccpg||'—'))}).addTo(map);
+window.ccpgZoningLayer=zoningLayer;
+let zoningFeatures=[],zoningRunning=false,zoningRecalculated=false;
+const zoneEl=id=>document.getElementById(id);
+function zoningStatus(message,isError=false){zoneEl('zoning-status').textContent=message;zoneEl('zoning-status').className='status'+(isError?' error':'')}
+function zoneLabel(z){return z===1?"CCPG (zone 1)":z===2?"0 à "+zoneEl("z2").value+" km (zone 2)":z===3?zoneEl("z2").value+" à "+zoneEl("z3").value+" km (zone 3)":z===4?zoneEl("z3").value+" à "+zoneEl("z4").value+" km (zone 4)":z===5?zoneEl("z4").value+" à 30 km (zone 5)":"Hors périmètre / distance indisponible"}
+function zoneForDistance(d){if(d<=Number(zoneEl('z2').value))return 2;if(d<=Number(zoneEl('z3').value))return 3;if(d<=Number(zoneEl('z4').value))return 4;if(d<=30)return 5;return 0}
+function applyZoneThresholds(){if(!zoningFeatures.length)return;for(const f of zoningFeatures){if(f.properties.zone!==1)f.properties.zone=Number.isFinite(f.properties.distance_km)?zoneForDistance(f.properties.distance_km):0}zoningLayer.clearLayers();zoningLayer.addData({type:'FeatureCollection',features:zoningFeatures});renderZoningTable()}
+function renderZoningTable(){const counts={1:0,2:0,3:0,4:0,5:0,0:0};const all=(window.zoningRows||[]).filter(zoningWithin30);for(const r of all)counts[r.zone in counts?r.zone:0]++;zoneEl('zoning-count').textContent='Communes évaluées : '+Math.max(0,all.length-15)+' extérieures · CCPG : '+counts[1]+' · Z2 : '+counts[2]+' · Z3 : '+counts[3]+' · Z4 : '+counts[4]+' · Z5 : '+counts[5]+' · Carte et exports : uniquement les communes jusqu’à 30 km.';const sorted=[...zoningFeatures].filter(f=>f.properties.zone===1||(Number.isFinite(f.properties.distance_km)&&f.properties.distance_km<=30)).sort((a,b)=>(a.properties.zone-b.properties.zone)||a.properties.nom.localeCompare(b.properties.nom,'fr'));zoneEl('zoning-rows').innerHTML=sorted.map(f=>{const p=f.properties;return '<tr><td>'+p.nom+'</td><td>'+(p.distance_km===null?'—':p.distance_km.toFixed(2)+' km')+'</td><td><span class="zoning-swatch" style="background:'+zoningColors[p.zone]+'"></span>'+(p.zone||'Hors')+'</td></tr>'}).join('')}
+async function fetchDept(code){const r=await fetch('https://geo.api.gouv.fr/departements/'+code+'/communes?fields=nom,code,centre&format=geojson&geometry=centre');if(!r.ok)throw Error('API Géo département '+code+' : '+r.status);return r.json()}
+async function fetchCommuneGeometry(code){const r=await fetch('https://geo.api.gouv.fr/communes/'+code+'?fields=nom,code,contour&format=geojson&geometry=contour');if(!r.ok)throw Error('Contour '+code+' : '+r.status);return r.json()}
+// Localisation des mairies indépendante du chargement des centres V6 (isochrones inchangées).
+const mairieCache=new Map();
+const zoningStoreKey='ccpg-zoning-v18-mairie-to-mairie-measures';
+const zoningMairieKey='ccpg-zoning-v17-mairies';
+function readLocal(key){try{return JSON.parse(localStorage.getItem(key)||'{}')}catch{return {}}}
+function saveLocal(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch(e){console.warn('Sauvegarde locale impossible',e)}}
+const savedMairies=readLocal(zoningMairieKey);
+const savedMeasures=readLocal(zoningStoreKey);
+for(const [code,point] of Object.entries(savedMairies))if(Array.isArray(point)&&point.length===2&&point.every(Number.isFinite))mairieCache.set(code,point);
+const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function retryZoning(action,label,maxAttempts=5){
+ let last;
+ for(let n=1;n<=maxAttempts;n++){
+  try{return await action()}
+  catch(e){last=e;const msg=String(e.message||e);if(/HTTP 400|HTTP 401|HTTP 403|coordonnées de mairie absentes/i.test(msg))throw e;
+   if(n===maxAttempts)break;
+   const delay=Math.min(25000,1500*Math.pow(2,n-1));
+   zoningStatus(label+' : incident temporaire ('+n+'/'+maxAttempts+'), nouvel essai dans '+Math.round(delay/1000)+' s…');
+   await pause(delay);
+  }
+ }
+ throw last;
+}
+async function getMairie(code,nom){
+ if(mairieCache.has(code))return mairieCache.get(code);
+ const url='https://geo.api.gouv.fr/communes/'+encodeURIComponent(code)+'?fields=nom,code&format=geojson&geometry=mairie';
+ let response;
+ try{response=await fetch(url)}catch(e){throw Error('Géolocalisation mairie de '+nom+' inaccessible : '+e.message)}
+ if(!response.ok)throw Error('Mairie de '+nom+' : API Géo HTTP '+response.status);
+ const data=await response.json();const point=data.geometry?.coordinates;
+ if(data.geometry?.type!=='Point'||!Array.isArray(point)||point.length<2||!point.every(Number.isFinite))throw Error('Coordonnées de mairie absentes pour '+nom+' (aucun remplacement par un centre géographique).');
+ mairieCache.set(code,point);savedMairies[code]=point;saveLocal(zoningMairieKey,savedMairies);return point;
+}
+async function runZoning(){if(zoningRunning)return;const key=zoneEl('key').value.trim();if(!key){zoningStatus('Renseignez la clé ORS dans le volet 01.',true);return}if(centers.length!==15){zoningStatus('Attendez le chargement des 15 communes CCPG.',true);return}const thresholds=['z2','z3','z4','z5'].map(id=>Number(zoneEl(id).value));if(thresholds.some(v=>!Number.isFinite(v)||v<=0)||!(thresholds[0]<thresholds[1]&&thresholds[1]<thresholds[2]&&thresholds[2]<thresholds[3]&&thresholds[3]===30)){zoningStatus('Les seuils doivent être strictement croissants et positifs.',true);return}
+zoningRunning=true;zoningRecalculated=false;zoneEl('zoning-run').disabled=true;zoneEl('zoning-csv').disabled=true;zoneEl('zoning-excel').disabled=true;zoneEl('zoning-geojson').disabled=true;zoningFeatures=[];zoningLayer.clearLayers();
+try{
+ zoningStatus('Chargement des communes voisines (Gard, Vaucluse, Bouches-du-Rhône)…');const collections=await Promise.all(['30','84','13'].map(fetchDept));const own=new Set(centers.map(c=>c.code));const outside=[];
+ for(const fc of collections)for(const f of fc.features||[]){const p=f.properties||{},co=f.geometry?.coordinates;if(own.has(p.code)||!co||!Number.isFinite(co[0]))continue;const nearby=centers.some(c=>{const dx=(co[0]-c.coords[0])*80,dy=(co[1]-c.coords[1])*111;return Math.hypot(dx,dy)<43});if(nearby)outside.push({code:p.code,name:p.nom,coords:co})}
+ if(!outside.length)throw Error('Aucune commune extérieure reçue.');
+ // Points de référence : mairies officielles, jamais les centres de géométrie pour le calcul.
+ zoningStatus('Localisation des 15 mairies CCPG…');
+ const mairieCCPG=[];
+ for(const c of centers){mairieCCPG.push(await retryZoning(()=>getMairie(c.code,c.name),'Mairie de '+c.name));}
+ const measured=[];const chunkSize=3;
+ const remaining=outside.filter(c=>!Object.prototype.hasOwnProperty.call(savedMeasures,c.code));
+ zoningStatus('Reprise : '+(outside.length-remaining.length)+' / '+outside.length+' distances déjà sauvegardées. '+remaining.length+' à calculer.');
+ for(let start=0;start<remaining.length;start+=chunkSize){
+  const batch=remaining.slice(start,start+chunkSize);
+  const done=outside.length-remaining.length+start;
+  zoningStatus('Mairies et distances routières : '+done+' / '+outside.length+' communes… ('+batch.map(c=>c.name).join(', ')+')');
+  const mairieExt=[];for(const c of batch)mairieExt.push(await retryZoning(()=>getMairie(c.code,c.name),'Mairie de '+c.name));
+  const locations=[...mairieExt,...mairieCCPG];
+  let matrix;
+  try{matrix=await retryZoning(()=>orsPost('matrix/driving-car',key,{locations,sources:batch.map((_,i)=>i),destinations:centers.map((_,i)=>batch.length+i),metrics:['distance'],units:'m'}),'Matrice ORS '+batch.map(c=>c.name).join(', '))}
+  catch(e){throw Error('Matrice ORS pour '+batch.map(c=>c.name).join(', ')+' : '+e.message)}
+  if(!Array.isArray(matrix.distances)||matrix.distances.length!==batch.length)throw Error('Réponse matrice ORS incomplète.');
+  batch.forEach((c,i)=>{const distances=matrix.distances[i];let best=Infinity,bestIdx=-1;distances.forEach((v,j)=>{if(Number.isFinite(v)&&v>=0&&v<best){best=v;bestIdx=j}});savedMeasures[c.code]={distance_km:bestIdx>=0?best/1000:null,closest:bestIdx>=0?centers[bestIdx].name:null}});
+  saveLocal(zoningStoreKey,savedMeasures);
+  zoningStatus('Distances sauvegardées : '+Math.min(done+batch.length,outside.length)+' / '+outside.length+' communes.');
+ }
+ for(const c of outside){const result=savedMeasures[c.code];if(result&&Object.prototype.hasOwnProperty.call(result,'distance_km'))measured.push({...c,...result});}
+ if(measured.length!==outside.length)throw Error('Résultats incomplets : '+measured.length+' / '+outside.length+' communes.');
+ // Ne récupérer que les contours dans le zonage proposé, et tous les 15 contours CCPG déjà chargés.
+ const selected=measured.filter(c=>c.distance_km!==null&&c.distance_km<=30);zoningStatus('Chargement des contours de '+selected.length+' communes dans le périmètre…');
+ const ownFeatures=boundaryLayer.toGeoJSON().features.map(f=>{f.properties={...f.properties,nom:f.properties.nom||centers.find(c=>c.code===f.properties.code)?.name||'CCPG',zone:1,distance_km:0,centre_ccpg:'CCPG'};return f});
+ const externalFeatures=[];for(let i=0;i<selected.length;i+=12){const batch=selected.slice(i,i+12);const fs=await Promise.all(batch.map(c=>retryZoning(()=>fetchCommuneGeometry(c.code),'Contour de '+c.name)));fs.forEach((f,j)=>{const c=batch[j];f.properties={...f.properties,nom:c.name,code:c.code,zone:zoneForDistance(c.distance_km),distance_km:c.distance_km,centre_ccpg:c.closest};externalFeatures.push(f)});zoningStatus('Contours chargés : '+Math.min(i+batch.length,selected.length)+' / '+selected.length)}
+ zoningRecalculated=true;zoningFeatures=[...ownFeatures,...externalFeatures];zoningLayer.addData({type:'FeatureCollection',features:zoningFeatures});if(zoneEl('zoning-visible').checked)zoningLayer.addTo(map);else map.removeLayer(zoningLayer);window.zoningRows=[...centers.map(c=>({code:c.code,name:c.name,distance_km:0,zone:1,closest:'CCPG'})),...measured.map(c=>({...c,zone:c.distance_km===null?0:zoneForDistance(c.distance_km)}))];renderZoningTable();zoneEl('zoning-csv').disabled=false;zoneEl('zoning-excel').disabled=false;zoneEl('zoning-geojson').disabled=false;zoningStatus('Calcul terminé : '+measured.length+' communes extérieures évaluées, '+selected.length+' classées jusqu’à 30 km. Distances calculées de mairie à mairie.');
+ // Les communes hors périmètre figurent dans le tableau exporté.
+ }catch(e){zoningStatus('Calcul interrompu (progression sauvegardée : relancez pour reprendre) : '+e.message,true)}finally{zoningRunning=false;zoneEl('zoning-run').disabled=false}}
+function downloadZoning(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+zoneEl('zoning-run').addEventListener('click',runZoning);
+zoneEl('zoning-visible').addEventListener('change',e=>{if(e.target.checked)zoningLayer.addTo(map);else map.removeLayer(zoningLayer)});
+zoneEl('zoning-opacity').addEventListener('input',e=>{const value=Number(e.target.value);zoneEl('zoning-opacity-value').textContent=value+' %';zoningLayer.setStyle({fillOpacity:value/100});});
+['z2','z3','z4'].forEach(id=>zoneEl(id).addEventListener('change',()=>{const vals=['z2','z3','z4'].map(k=>Number(zoneEl(k).value));if(!(vals[0]>0&&vals[0]<vals[1]&&vals[1]<vals[2]))return;applyZoneThresholds();if(window.zoningRows)window.zoningRows.forEach(c=>{if(c.zone!==1)c.zone=c.distance_km===null?0:zoneForDistance(c.distance_km)});renderZoningTable()}));
+// Export trié par zone (1,2,3,4,0), puis distance croissante et nom.
+const exportHeaders=['Code INSEE','Commune','Catégorie','Zone','Distance routière (km)','Mairie CCPG la plus proche','Statut de la distance','Méthode et sens du trajet'];
+function zoningWithin30(r){return r.zone===1||(Number.isFinite(r.distance_km)&&r.distance_km<=30)}function sortedZoningRows(){const order={1:0,2:1,3:2,4:3,5:4,0:5};return [...(window.zoningRows||[]).filter(zoningWithin30)].sort((a,b)=>(order[a.zone]??5)-(order[b.zone]??5)||(Number.isFinite(a.distance_km)?a.distance_km:Infinity)-(Number.isFinite(b.distance_km)?b.distance_km:Infinity)||a.name.localeCompare(b.name,'fr'))}
+function exportFields(r){const own=r.zone===1,valid=Number.isFinite(r.distance_km);return [r.code,r.name,own?'Commune CCPG':'Commune extérieure',zoneLabel(r.zone),own?'0 (convention)':valid?r.distance_km:'',own?'Sans objet':r.closest||'',own?'0 km conventionnel — non mesuré':valid?'Distance routière ORS Matrix':'Distance non disponible',own?'Commune appartenant à la CCPG':'Mairie extérieure vers mairie CCPG — ORS Matrix driving-car']}
+zoneEl('zoning-csv').addEventListener('click',()=>{
+ const lines=[exportHeaders.map(csvField).join(';')];
+ for(const r of sortedZoningRows()){const fields=exportFields(r).map((v,i)=>i===4&&typeof v==='number'?v.toFixed(3).replace('.',','):v);lines.push(fields.map(csvField).join(';'))}
+ downloadZoning('ccpg_zonage_routier_communes_v23_trie.csv','\ufeff'+lines.join('\r\n'),'text/csv;charset=utf-8');
+});
+function csvField(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
+function xmlEscape(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&apos;')}
+// Véritable fichier XLSX, généré au clic dans le navigateur avec ExcelJS.
+zoneEl('zoning-excel').addEventListener('click',async()=>{
+ const btn=zoneEl('zoning-excel'),oldLabel=btn.textContent;
+ if(!window.ExcelJS){zoningStatus('Bibliothèque Excel non chargée. Vérifiez la connexion Internet puis rechargez la page.',true);return;}
+ btn.disabled=true;btn.textContent='Création du fichier Excel…';
+ try{
+  const wb=new ExcelJS.Workbook();wb.creator='CCPG — Transport solidaire';wb.created=new Date();
+  const ws=wb.addWorksheet('Zonage par zone',{views:[{state:'frozen',ySplit:1}]});
+  ws.columns=exportHeaders.map((header,i)=>({header,key:'c'+i,width:[15,29,23,27,25,32,36,62][i]}));
+  const fills={1:'FFF9DC',2:'FFC928',3:'F58A18',4:'E34427',0:'A81923'};
+  ws.getRow(1).height=32;
+  ws.getRow(1).eachCell(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF523D38'}};c.font={bold:true,color:{argb:'FFFFFFFF'}};c.alignment={vertical:'middle',wrapText:true};});
+  for(const r of sortedZoningRows()){
+   const fields=exportFields(r);
+   if(typeof fields[4]==='number')fields[4]=Math.round(fields[4]*100)/100;
+   const row=ws.addRow(fields),color=fills[r.zone]||'EEEEEE';
+   row.eachCell({includeEmpty:true},c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+color}};c.font={color:{argb:r.zone===4||r.zone===5||r.zone===0?'FFFFFFFF':'FF30251E'}};c.alignment={vertical:'middle'};});
+   if(typeof fields[4]==='number')row.getCell(5).numFmt='0.00';
+   row.height=21;
+  }
+  ws.autoFilter={from:'A1',to:'H'+ws.rowCount};
+  const buffer=await wb.xlsx.writeBuffer();
+  downloadZoning('ccpg_zonage_routier_v24_zones_colorees.xlsx',buffer,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  zoningStatus('Export Excel .xlsx prêt : '+(ws.rowCount-1)+' communes, triées et colorées par zone.');
+ }catch(e){zoningStatus('Échec de la création Excel : '+e.message,true)}
+ finally{btn.disabled=false;btn.textContent=oldLabel}
+});
+
+zoneEl('zoning-geojson').addEventListener('click',()=>downloadZoning('ccpg_zonage_routier_communes.geojson',JSON.stringify({type:'FeatureCollection',features:zoningFeatures},null,2),'application/geo+json'));
+</script><script>
+// Diagnostic Matrix : test du serveur sélectionné.
+document.getElementById('matrix-test').addEventListener('click',async function(){
+ const btn=this,key=document.getElementById('key').value.trim();
+ if(!key){zoningStatus('Saisissez votre clé ORS dans le volet 01.',true);return;}
+ if(centers.length!==15){zoningStatus('Attendez le chargement des communes CCPG.',true);return;}
+ btn.disabled=true;
+ try{
+  zoningStatus('Test Matrix : récupération de deux mairies CCPG…');
+  const a=await getMairie(centers[0].code,centers[0].name);
+  const b=await getMairie(centers[1].code,centers[1].name);
+  zoningStatus('Test Matrix : envoi d’une matrice de 2 mairies à HEIGIT/ORS…');
+  const result=await orsPost('matrix/driving-car',key,{locations:[a,b],sources:[0],destinations:[1],metrics:['distance'],units:'m'});
+  const meters=result.distances?.[0]?.[0];
+  if(!Number.isFinite(meters))throw Error('ORS a répondu, mais aucune distance routière valide n’a été fournie.');
+  zoningStatus('✓ ORS Matrix fonctionne sur 2 mairies : '+centers[0].name+' → '+centers[1].name+' = '+(meters/1000).toFixed(2)+' km.');
+ }catch(e){
+  zoningStatus('ÉCHEC DU TEST MATRIX : '+e.message+'. Essayez l’autre serveur dans la liste, puis consultez F12 > Console si nécessaire.',true);
+ }finally{btn.disabled=false;}
+});
+</script>
+<script>
+// Snapshot partagé, indépendant du localStorage de chaque visiteur.
+(async function loadPublishedZoning(){
+ try{
+  const response=await fetch('/data/zonage.json',{cache:'no-store'});
+  if(!response.ok)throw Error('Données publiées indisponibles');
+  const dataset=await response.json();if(zoningRunning||zoningRecalculated)return;window.zoningRows=dataset.rows.map(r=>({...r,zone:r.zone===1?1:Number.isFinite(r.distance_km)?zoneForDistance(r.distance_km):0}));
+  renderZoningTable();zoneEl('zoning-csv').disabled=false;zoneEl('zoning-excel').disabled=false;
+  zoningStatus('Données publiées chargées : '+dataset.rows.length+' communes. Chargement des contours cartographiques…');
+  const visible=window.zoningRows.filter(zoningWithin30);
+  let done=0;const features=[];
+  // Chargement par lots pour ne pas saturer l’API Géo.
+  for(let i=0;i<visible.length;i+=8){
+   const chunk=visible.slice(i,i+8);
+   const results=await Promise.allSettled(chunk.map(x=>fetchCommuneGeometry(x.code)));
+   results.forEach((v,j)=>{if(v.status!=='fulfilled')return;const x=chunk[j];const f=v.value;
+    f.properties={...(f.properties||{}),nom:x.name,code:x.code,zone:x.zone===1?1:zoneForDistance(x.distance_km),distance_km:x.distance_km,centre_ccpg:x.closest};features.push(f);
+   });done+=chunk.length;
+  }
+  if(zoningRunning||zoningRecalculated)return;zoningFeatures=features;zoningLayer.clearLayers();zoningLayer.addData({type:'FeatureCollection',features});if(window.ccpgIsochronesCalculated){zoneEl('zoning-visible').checked=false;if(map.hasLayer(zoningLayer))map.removeLayer(zoningLayer);}
+  zoneEl('zoning-geojson').disabled=false;renderZoningTable();
+  if(zoningRunning||zoningRecalculated)return;zoningStatus('Zonage publié : '+dataset.rows.length+' communes, '+features.length+' contours affichés. Les recalculs sont accessibles avec une clé ORS personnelle.');
+ }catch(e){if(!zoningRunning&&!zoningRecalculated)zoningStatus('Chargement du zonage publié : '+e.message,true)}
+})();
+</script><script>
+/* Version consultation : jeux de données statiques, sans appel à ORS. */
+(function(){
+'use strict';
+const registry={all:'/data/isochrones/global.geojson'};
+let current=null;
+const origin=document.getElementById('iso-origin');
+const max=document.getElementById('max');
+const exportBtn=document.getElementById('export');
+const statusNode=document.getElementById('status');
+function show(message,error){
+  statusNode.textContent=message;
+  statusNode.className='status'+(error?' error':'');
+}
+function draw(){
+ if(!current)return;
+ const limit=Number(max.value);
+ const selected=current.features.filter(f=>Number(f.properties?.max_minutes)<=limit);
+ bandFeatures=selected;
+ isoLayer.clearLayers();
+ isoLayer.addData({type:'FeatureCollection',features:selected.slice().reverse()});
+ document.getElementById('showIso').checked=true;
+ visibility();
+ exportBtn.disabled=!selected.length;
+ const legend=document.getElementById('legend');
+ legend.innerHTML=selected.map(f=>'<div class="legend-row"><span class="swatch" style="background:'+f.properties.color+'"></span>'+f.properties.label+'</div>').join('');
+ show(selected.length+' couronnes pré-calculées affichées · '+(origin.selectedOptions[0]?.textContent||'CCPG')+'.');
+}
+async function load(name){
+ if(!registry[name]){
+  show('Les données de cette commune ne sont pas encore disponibles.',true);return;
+ }
+ try{
+  show('Chargement des isochrones pré-calculés…');
+  const response=await fetch(registry[name],{cache:'no-store'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const data=await response.json();
+  if(data.type!=='FeatureCollection'||!Array.isArray(data.features))throw Error('GeoJSON invalide');
+  current=data;draw();
+  if(isoLayer.getLayers().length)map.fitBounds(isoLayer.getBounds().pad(.08));
+ }catch(error){show('Impossible de charger les isochrones : '+error.message,true)}
+}
+origin.addEventListener('change',()=>load(origin.value));
+max.addEventListener('change',draw);
+document.getElementById('clear').addEventListener('click',()=>{
+ current=null;show('Affichage effacé. Choisissez une origine pour recharger les données.');
+});
+window.ccpgAjouterIsochrones=function(code,url){
+ if(!COMMUNES.some(c=>c[0]===code))throw Error('Code de commune inconnu');
+ registry[code]=url;
+ const opt=[...origin.options].find(o=>o.value===code);
+ if(opt){opt.disabled=false;opt.textContent=opt.textContent.replace(' · bientôt disponible','');}
+};
+load('all');
+})();
+</script></body></html>
